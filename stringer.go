@@ -52,13 +52,15 @@ var (
 	text            = flag.Bool("text", false, "if true, text marshaling methods will be generated. Default: false")
 	output          = flag.String("output", "", "output file name; default srcdir/<type>_string.go")
 	transformMethod = flag.String("transform", "noop", "enum item name transformation method. Default: noop")
-	trimPrefix      = flag.String("trimprefix", "", "transform each item name by removing a prefix. Default: \"\"")
 	lineComment     = flag.Bool("linecomment", false, "use line comment text as printed text when present")
 )
 
-var comments arrayFlags
+var (
+	comments, trimprefix arrayFlags
+)
 
 func init() {
+	flag.Var(&trimprefix, "trimprefix", "transform each item name by removing a prefix. Default: \"\"")
 	flag.Var(&comments, "comment", "comments to include in generated code, can repeat. Default: \"\"")
 }
 
@@ -127,7 +129,7 @@ func main() {
 
 	// Run generate for each type.
 	for _, typeName := range types {
-		g.generate(typeName, *json, *yaml, *sql, *gql, *text, *transformMethod, *trimPrefix, *lineComment)
+		g.generate(typeName, *json, *yaml, *sql, *gql, *text, *transformMethod, trimprefix, *lineComment)
 	}
 
 	// Format the output.
@@ -332,9 +334,11 @@ func (g *Generator) transformValueNames(values []Value, transformMethod string) 
 }
 
 // trimValueNames removes a prefix from each name
-func (g *Generator) trimValueNames(values []Value, prefix string) {
+func (g *Generator) trimValueNames(values []Value, prefix []string) {
 	for i := range values {
-		values[i].name = strings.TrimPrefix(values[i].name, prefix)
+		for _, p := range prefix {
+			values[i].name = strings.TrimPrefix(values[i].name, p)
+		}
 	}
 }
 
@@ -347,7 +351,7 @@ func (g *Generator) replaceValuesWithLineComment(values []Value) {
 }
 
 // generate produces the String method for the named type.
-func (g *Generator) generate(typeName string, includeJSON, includeYAML, includeSQL, includeGQL, includeText bool, transformMethod string, trimPrefix string, lineComment bool) {
+func (g *Generator) generate(typeName string, includeJSON, includeYAML, includeSQL, includeGQL, includeText bool, transformMethod string, trimPrefix []string, lineComment bool) {
 	values := make([]Value, 0, 100)
 	for _, file := range g.pkg.files {
 		// Set the state for this run of the walker.

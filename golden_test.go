@@ -1226,32 +1226,32 @@ func (i Prime) IsAPrime() bool {
 
 func TestGolden(t *testing.T) {
 	for _, test := range golden {
-		runGoldenTest(t, test, false, false, false, false, false, "")
+		runGoldenTest(t, test, false, false, false, false, false, nil)
 	}
 	for _, test := range goldenJSON {
-		runGoldenTest(t, test, true, false, false, false, false, "")
+		runGoldenTest(t, test, true, false, false, false, false, nil)
 	}
 	for _, test := range goldenText {
-		runGoldenTest(t, test, false, false, false, false, true, "")
+		runGoldenTest(t, test, false, false, false, false, true, nil)
 	}
 	for _, test := range goldenYAML {
-		runGoldenTest(t, test, false, true, false, false, false, "")
+		runGoldenTest(t, test, false, true, false, false, false, nil)
 	}
 	for _, test := range goldenSQL {
-		runGoldenTest(t, test, false, false, true, false, false, "")
+		runGoldenTest(t, test, false, false, true, false, false, nil)
 	}
 	for _, test := range goldenGQL {
-		runGoldenTest(t, test, false, false, false, true, false, "")
+		runGoldenTest(t, test, false, false, false, true, false, nil)
 	}
 	for _, test := range goldenJSONAndSQL {
-		runGoldenTest(t, test, true, false, true, false, false, "")
+		runGoldenTest(t, test, true, false, true, false, false, nil)
 	}
 	for _, test := range goldenPrefix {
-		runGoldenTest(t, test, false, false, false, false, false, "Day")
+		runGoldenTest(t, test, false, false, false, false, false, []string{"Day"})
 	}
 }
 
-func runGoldenTest(t *testing.T, test Golden, generateJSON, generateYAML, generateSQL, generateGQL, generateText bool, prefix string) {
+func runGoldenTest(t *testing.T, test Golden, generateJSON, generateYAML, generateSQL, generateGQL, generateText bool, prefix []string) {
 	var g Generator
 	input := "package test\n" + test.input
 	file := test.name + ".go"
