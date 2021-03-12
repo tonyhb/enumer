@@ -24,12 +24,17 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
 	"golang.org/x/tools/go/packages"
 
 	"github.com/pascaldekloe/name"
+)
+
+var (
+	re = regexp.MustCompile(`(\w)(\d+)`)
 )
 
 type arrayFlags []string
@@ -330,6 +335,8 @@ func (g *Generator) transformValueNames(values []Value, transformMethod string) 
 
 	for i := range values {
 		values[i].name = strings.ToLower(name.Delimit(values[i].name, sep))
+		// We also want to add the separator to numbers, eg level1 becomes level_1.
+		values[i].name = re.ReplaceAllString(values[i].name, "${1}_${2}")
 	}
 }
 

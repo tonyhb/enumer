@@ -13,7 +13,7 @@ const unmarshalGqlMethod = `func (i *%[1]s) UnmarshalGQL(v interface{}) error {
 		str = string(bytes[:])
 	}
 
-	val, err := %[1]sString(str)
+	val, err := %[1]sFromString(str)
 	if err != nil {
 		return err
 	}
